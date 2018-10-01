@@ -1,5 +1,4 @@
-package ThreadChatProgram.Server;
-import ThreadChatProgram.Server.ClientHandler;
+package Server;
 
 import java.io.*;
 import java.net.*;
@@ -34,7 +33,7 @@ public class ThreadServer
             Socket client = serverSocket.accept();
             System.out.println("\nNew client accepted.\n");
 
-
+            //Add client to threadPool (which executes thread)
             clients.add(client);
             ClientHandler handler = new ClientHandler(client, clients);
             executor.submit(handler);

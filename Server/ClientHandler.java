@@ -1,4 +1,4 @@
-package ThreadChatProgram.Server;
+package Server;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -6,7 +6,7 @@ import java.net.Socket;
 import java.util.List;
 import java.util.Scanner;
 
-class ClientHandler extends Thread
+class ClientHandler implements Runnable
 {
     private Socket client;
     private List<Socket> clients;
@@ -31,6 +31,7 @@ class ClientHandler extends Thread
     }
     public void run()
     {
+        //Write until quit
         do
         {
             received = input.nextLine();
@@ -61,42 +62,59 @@ class ClientHandler extends Thread
         }
     }
 
+    //Switch statement based on input from client
     private void inputTreating(String message, PrintWriter out)
     {
         switch (message.substring(0,4))
         {
             //Login case
             case "JOIN":
-                String username = message.substring(5,message.indexOf(","));
-                System.out.println(message.substring(5,message.indexOf(",")));
-                if(!ThreadServer.userNames.contains(username))
-                {
-                    ThreadServer.userNames.add(username);
-                    out.println("J_OK");
-                }
-                else
-                {
-                    out.println("J_ER 1: Username taken");
-                }
+                loginCheck(message, out);
                 break;
 
             case "DATA":
-                for (Socket s: clients)
-                {
-                    try
-                    {
-                        out = new PrintWriter(s.getOutputStream(), true);
-                    }
-                    catch (IOException e)
-                    {
-                        e.printStackTrace();
-                    }
-                }
+                broadcast(out);
                 break;
 
             default:
                 out.println("Error");
                 break;
+        }
+    }
+    private void loginCheck (String message, PrintWriter out)
+    {
+        //Takes username out of String
+        String username = message.substring(5,message.indexOf(","));
+
+        //For testing purposes!
+        System.out.println(message.substring(5,message.indexOf(",")));
+
+
+        if(!ThreadServer.userNames.contains(username))
+        {
+            ThreadServer.userNames.add(username);
+            out.println("J_OK");
+        }
+        else
+        {
+            out.println("J_ER 1: Username taken");
+        }
+    }
+
+    private void broadcast(PrintWriter out)
+    {
+
+        //Prints to every client
+        for (Socket s: clients)
+        {
+            try
+            {
+                out = new PrintWriter(s.getOutputStream(), true);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
         }
     }
 }

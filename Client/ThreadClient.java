@@ -1,6 +1,7 @@
-package ThreadChatProgram.Client;
+package Client;
 import java.io.*;
 import java.net.*;
+import java.util.Scanner;
 
 public class ThreadClient
 {
@@ -25,7 +26,28 @@ public class ThreadClient
             Socket socket = null;
             try
             {
+                //Connects to server
                 socket = new Socket(host, PORT);
+
+
+
+                // PROBLEM!!!!
+                Scanner scanner = new Scanner(socket.getInputStream());
+                String answer;
+                do
+                {
+                    System.out.println("Enter desired username: ");
+                    Scanner userEntry = new Scanner(System.in);
+                    String userName = userEntry.nextLine();
+                    System.out.println(userName);
+                    PrintWriter out = new PrintWriter(socket.getOutputStream());
+                    out.println("JOIN " + userName + "," + host + ":" + PORT);
+                    answer = scanner.nextLine();
+                    System.out.println(answer);
+                }
+                while (!answer.equals("J_OK"));
+                //PROBLEM SLUT HER!!!
+
 
                 Thread clientIn = new Thread(new ClientRead(socket));
                 Thread clientOut = new Thread(new ClientWrite(socket));
