@@ -2,20 +2,23 @@ package Server;
 
 import java.io.*;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadServer
 {
     private static List<Socket> clients = new ArrayList<>();
-    public static List<String> userNames = new ArrayList<>();
+    public static Map<String, Boolean> userNames = new HashMap<>();
     private static ServerSocket serverSocket;
     private static final int PORT = 1234;
 
     public static void main(String[] args) throws IOException
     {
+        ActiveUsers killerTask = new ActiveUsers();
+        Timer activeUsers = new Timer(true);
+        activeUsers.scheduleAtFixedRate(killerTask,0, 5*1000);
+
         try
         {
             serverSocket = new ServerSocket(PORT);

@@ -74,6 +74,7 @@ class ClientHandler implements Runnable
 
             case "IMAV":
                 System.out.println(this.username + " is alive");
+                ThreadServer.userNames.put(username, true);
                 break;
 
             default:
@@ -90,9 +91,9 @@ class ClientHandler implements Runnable
         System.out.println(message.substring(5,message.indexOf(",")));
 
 
-        if(!ThreadServer.userNames.contains(username))
+        if(!ThreadServer.userNames.containsKey(username))
         {
-            ThreadServer.userNames.add(username);
+            ThreadServer.userNames.put(username, true);
             this.username = username;
             clients.add(client);
             out.println("J_OK");
@@ -108,7 +109,7 @@ class ClientHandler implements Runnable
     {
         StringBuilder sb = new StringBuilder();
         sb.append("LIST ");
-        for (String username:ThreadServer.userNames)
+        for (String username:ThreadServer.userNames.keySet())
         {
             sb.append(username + " ");
         }
@@ -116,7 +117,7 @@ class ClientHandler implements Runnable
         return sb.toString();
     }
 
-    private void broadcast(PrintWriter out, String message)
+    public void broadcast(PrintWriter out, String message)
     {
         //Prints to every client
         for (Socket s: clients)
@@ -141,4 +142,5 @@ class ClientHandler implements Runnable
         System.out.println("Client " + this.username + " removed from active users");
         broadcast(output, getUserNames());
     }
+
 }
