@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 public class ThreadServer
 {
-    private static List<Socket> clients = new ArrayList<>();
+    public static List<Socket> clients = new ArrayList<>();
     public static Map<String, Boolean> userNames = new HashMap<>();
     private static ServerSocket serverSocket;
     private static final int PORT = 1234;
@@ -17,7 +17,7 @@ public class ThreadServer
     {
         ActiveUsers killerTask = new ActiveUsers();
         Timer activeUsers = new Timer(true);
-        activeUsers.scheduleAtFixedRate(killerTask,0, 5*1000);
+        activeUsers.scheduleAtFixedRate(killerTask,0, 1*1000);
 
         try
         {
@@ -37,7 +37,7 @@ public class ThreadServer
             System.out.println("\nNew client accepted.\n");
 
             //Add client to threadPool (which executes thread)
-            ClientHandler handler = new ClientHandler(client, clients);
+            ClientHandler handler = new ClientHandler(client);
             executor.submit(handler);
         }
     }

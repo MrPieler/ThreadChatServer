@@ -28,7 +28,7 @@ public class ThreadClient
         login(socket);
         IMAV alive = new IMAV(out);
         Timer imav = new Timer(true);
-        imav.scheduleAtFixedRate(alive, 0, 5*1000);
+        imav.scheduleAtFixedRate(alive, 0, 1*1000);
         sendMessages(socket);
     }
 
@@ -62,6 +62,12 @@ public class ThreadClient
                 out.println("JOIN " + username + "," + host.getHostAddress() + ":" + PORT);
                 Scanner scanner = new Scanner(socket.getInputStream());
                 answer = scanner.nextLine();
+
+                if (answer.substring(0,4).equals("J_ER"))
+                {
+                    System.out.println("Error " + answer.substring(5));
+                    System.out.println();
+                }
             }
             while (!answer.equals("J_OK"));
             System.out.println("Welcome " + username + " - You have successfully joined the chat!");

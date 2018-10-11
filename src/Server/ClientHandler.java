@@ -9,16 +9,14 @@ import java.util.Scanner;
 class ClientHandler implements Runnable
 {
     private Socket client;
-    private List<Socket> clients;
     private Scanner input;
     private PrintWriter output;
     private String received;
     private String username;
 
-    public ClientHandler(Socket socket, List<Socket> clients)
+    public ClientHandler(Socket socket)
     {
         this.client = socket;
-        this.clients = clients;
         try
         {
             input = new Scanner(client.getInputStream());
@@ -65,7 +63,7 @@ class ClientHandler implements Runnable
                 break;
 
             case "DATA":
-                broadcast(out, message);
+                broadcast(message);
                 break;
 
             case "QUIT":
@@ -73,7 +71,6 @@ class ClientHandler implements Runnable
                 break;
 
             case "IMAV":
-                System.out.println(this.username + " is alive");
                 ThreadServer.userNames.put(username, true);
                 break;
 
@@ -95,17 +92,17 @@ class ClientHandler implements Runnable
         {
             ThreadServer.userNames.put(username, true);
             this.username = username;
-            clients.add(client);
+            ThreadServer.clients.add(client);
             out.println("J_OK");
         }
         else
         {
             out.println("J_ER 1: Username_taken");
         }
-        broadcast(output, getUserNames());
+        broadcast(getUserNames());
     }
 
-    private String getUserNames()
+    public static String getUserNames()
     {
         StringBuilder sb = new StringBuilder();
         sb.append("LIST ");
@@ -117,14 +114,14 @@ class ClientHandler implements Runnable
         return sb.toString();
     }
 
-    public void broadcast(PrintWriter out, String message)
+    public static void broadcast(String message)
     {
         //Prints to every client
-        for (Socket s: clients)
+        for (Socket s: ThreadServer.clients)
         {
             try
             {
-                out = new PrintWriter(s.getOutputStream(), true);
+                PrintWriter out = new PrintWriter(s.getOutputStream(), true);
                 out.println(message);
             }
             catch (IOException e)
@@ -136,11 +133,10 @@ class ClientHandler implements Runnable
 
     private void quit()
     {
-        clients.remove(client);
+        ThreadServer.clients.remove(client);
         ThreadServer.userNames.remove(this.username);
         Thread.currentThread().interrupt();
         System.out.println("Client " + this.username + " removed from active users");
-        broadcast(output, getUserNames());
+        broadcast(getUserNames());
     }
-
 }
